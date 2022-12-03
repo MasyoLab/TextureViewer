@@ -52,4 +52,14 @@ public static class Util {
             });
         }).ToArray();
     }
+
+    /// <summary>
+    /// 指定パスを開く
+    /// </summary>
+    /// <param name="path"></param>
+    public static void OpenPath(string path) {
+        var fileInfo = new FileInfo(path);
+        var directoryInfo = fileInfo.Directory;
+        Application.OpenURL(directoryInfo.FullName);
+    }
 }

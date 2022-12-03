@@ -10,23 +10,43 @@ using System.IO;
 /// </summary>
 public class TextureManager : SingletonMonoBehaviour<TextureManager> {
 
-    public class SpriteInstance {
-        public Sprite sprite { private set; get; }
-        public int width { private set; get; }
-        public int height { private set; get; }
-        public float aspect { private set; get; }
+    public interface ISpriteInstance {
+        Sprite Sprite { get; }
+        float Aspect { get; }
+    }
+    public class SpriteInstance : ISpriteInstance {
+        public Sprite Sprite { private set; get; }
+        public float Aspect { private set; get; }
+        public int LifeSpan { set; get; }
 
-        public SpriteInstance(Sprite s, int w, int h) {
-            sprite = s;
-            width = w;
-            height = h;
-            aspect = (float)width / (float)height;
+        public SpriteInstance(Sprite sprite, int width, int height) {
+            Sprite = sprite;
+            Aspect = (float)width / (float)height;
+            LifeSpan = 10;
+        }
+        ~SpriteInstance() {
+            Release();
+        }
+
+        public void Release() {
+            if (Sprite != null) {
+                Destroy(Sprite);
+            }
+            Sprite = null;
         }
     }
 
     private Dictionary<string, SpriteInstance> _spriteDict = new();
+    private List<KeyValuePair<string, SpriteInstance>> _deletingTarget = new();
 
-    public IEnumerator LoadTextureCoroutine(string filePath, UnityAction<SpriteInstance> unityAction) {
+    private void OnDestroy() {
+        foreach (var item in _spriteDict) {
+            item.Value.Release();
+        }
+        _spriteDict.Clear();
+    }
+
+    public IEnumerator LoadTextureCoroutine(string filePath, UnityAction<ISpriteInstance> unityAction) {
 
         if (_spriteDict.ContainsKey(filePath)) {
             unityAction?.Invoke(_spriteDict[filePath]);
@@ -50,5 +70,21 @@ public class TextureManager : SingletonMonoBehaviour<TextureManager> {
         _spriteDict.Add(filePath, new(sprite, texture2D.width, texture2D.height));
 
         unityAction?.Invoke(_spriteDict[filePath]);
+        StartCoroutine(LifecycleCoroutine());
+    }
+
+    private IEnumerator LifecycleCoroutine() {
+        yield return null;
+        _deletingTarget.Clear();
+        foreach (var item in _spriteDict) {
+            item.Value.LifeSpan--;
+            if (item.Value.LifeSpan <= 0) {
+                _deletingTarget.Add(item);
+            }
+        }
+        foreach (var item in _deletingTarget) {
+            _spriteDict.Remove(item.Key);
+        }
+        _deletingTarget.Clear();
     }
 }

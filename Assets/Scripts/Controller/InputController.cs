@@ -11,13 +11,13 @@ public class InputController : MonoBehaviour {
     [SerializeField]
     private InputField _input = null;
     [SerializeField]
-    private CustomButton _button = null;
+    private CustomButton _loadButton = null;
 
     private void Awake() {
-        _button.onClick.AddListener(OnClick);
+        _loadButton.onClick.AddListener(OnLoad);
     }
 
-    private void OnClick() {
+    private void OnLoad() {
         Common.Instance.FileManager.SetDirectory(_input.text);
     }
 }

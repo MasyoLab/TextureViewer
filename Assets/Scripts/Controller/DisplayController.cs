@@ -12,17 +12,23 @@ public class DisplayController : MonoBehaviour {
     private Image _image = null;
     [SerializeField]
     private AspectRatioFitter _aspectRatioFitter = null;
+    [SerializeField]
+    private CustomButton _openButton = null;
 
-    private LinkedList<FileManager.FilePath> _itemList = new();
+    private List<LinkedListNode<FileManager.FilePath>> _itemNodeList = new();
+    private LinkedList<FileManager.FilePath> _itemLinked = new();
     private LinkedListNode<FileManager.FilePath> _currentNode = null;
 
     private float _timeCount = 0;
     private Vector2 _screenSize = default;
+    private RectTransform _display => Common.Instance.Display;
 
     // Start is called before the first frame update
     private void Start() {
-        _screenSize.x = Screen.width;
-        _screenSize.y = Screen.height;
+        _openButton.onClick.AddListener(OnOpen);
+
+        _screenSize.x = _display.rect.width;
+        _screenSize.y = _display.rect.height;
         _image.color = Color.clear;
 
         Common.Instance.OnStart.AddListener(() => {
@@ -40,6 +46,10 @@ public class DisplayController : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         _timeCount += Time.deltaTime;
+        if (10 < _timeCount) {
+            ShowImage();
+            _timeCount = 0;
+        }
         AdjustScreenSize();
     }
 
@@ -47,9 +57,11 @@ public class DisplayController : MonoBehaviour {
     /// 表示対象を登録する
     /// </summary>
     private void SetAddLast() {
-        _itemList.Clear();
+        _itemLinked.Clear();
+        _itemNodeList.Clear();
         foreach (var item in Common.Instance.FileManager.FilePathList) {
-            _itemList.AddLast(item);
+            var linkedListNode = _itemLinked.AddLast(item);
+            _itemNodeList.Add(linkedListNode);
         }
     }
 
@@ -57,8 +69,13 @@ public class DisplayController : MonoBehaviour {
     /// LinkedListNode を更新
     /// </summary>
     private void NextNode() {
-        if (_currentNode == null || _currentNode.Next == null) {
-            _currentNode = _itemList.First;
+        if (_currentNode == null) {
+            var random = new System.Random();
+            var rnd = random.Next(_itemNodeList.Count);
+            _currentNode = _itemNodeList[rnd];
+        }
+        if (_currentNode.Next == null) {
+            _currentNode = _itemLinked.First;
         }
         else {
             _currentNode = _currentNode.Next;
@@ -74,8 +91,8 @@ public class DisplayController : MonoBehaviour {
         StartCoroutine(Common.Instance.TextureManager.LoadTextureCoroutine(_currentNode.Value.Path, inst => {
             _aspectRatioFitter.aspectMode = AspectRatioFitter.AspectMode.None;
             _image.color = Color.white;
-            _image.sprite = inst.sprite;
-            _aspectRatioFitter.aspectRatio = inst.aspect;
+            _image.sprite = inst.Sprite;
+            _aspectRatioFitter.aspectRatio = inst.Aspect;
             DisplaySizeUpdate();
         }));
     }
@@ -88,16 +105,16 @@ public class DisplayController : MonoBehaviour {
         _image.SetNativeSize();
         _aspectRatioFitter.enabled = true;
 
-        if (Screen.height < _image.rectTransform.sizeDelta.y) {
+        if (_display.rect.height < _image.rectTransform.sizeDelta.y) {
             _aspectRatioFitter.aspectMode = AspectRatioFitter.AspectMode.HeightControlsWidth;
             var size = _image.rectTransform.sizeDelta;
-            size.y = Screen.height;
+            size.y = _display.rect.height;
             _image.rectTransform.sizeDelta = size;
         }
-        if (Screen.width < _image.rectTransform.sizeDelta.x) {
+        if (_display.rect.width < _image.rectTransform.sizeDelta.x) {
             _aspectRatioFitter.aspectMode = AspectRatioFitter.AspectMode.WidthControlsHeight;
             var size = _image.rectTransform.sizeDelta;
-            size.x = Screen.width;
+            size.x = _display.rect.width;
             _image.rectTransform.sizeDelta = size;
         }
     }
@@ -106,10 +123,17 @@ public class DisplayController : MonoBehaviour {
     /// 画面サイズの変更を監視する
     /// </summary>
     private void AdjustScreenSize() {
-        if (Screen.width != _screenSize.x || Screen.height != _screenSize.y) {
+        if (_display.rect.width != _screenSize.x || _display.rect.height != _screenSize.y) {
             DisplaySizeUpdate();
         }
-        _screenSize.x = Screen.width;
-        _screenSize.y = Screen.height;
+        _screenSize.x = _display.rect.width;
+        _screenSize.y = _display.rect.height;
+    }
+
+    private void OnOpen() {
+        if (_currentNode == null) {
+            return;
+        }
+        Util.OpenPath(_currentNode.Value.Path);
     }
 }
