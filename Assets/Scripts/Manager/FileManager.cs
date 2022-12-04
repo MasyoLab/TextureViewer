@@ -52,6 +52,7 @@ public class FileManager : SingletonMonoBehaviour<FileManager> {
             yield break;
         }
 
+        Common.Instance.DisplayStop();
         _filePathDict.Clear();
         _filePathList.Clear();
 

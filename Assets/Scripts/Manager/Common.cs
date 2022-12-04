@@ -38,4 +38,8 @@ public class Common : SingletonMonoBehaviour<Common> {
     public void DisplayStart() {
         OnStart?.Invoke();
     }
+
+    public void DisplayStop() {
+        OnStop?.Invoke();
+    }
 }

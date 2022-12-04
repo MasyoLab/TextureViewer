@@ -32,7 +32,9 @@ public class DisplayController : MonoBehaviour {
         _image.color = Color.clear;
 
         Common.Instance.OnStart.AddListener(() => {
+            _timeCount = 0;
             enabled = true;
+            _currentNode = null;
             SetAddLast();
             ShowImage();
         });
@@ -94,7 +96,7 @@ public class DisplayController : MonoBehaviour {
             _image.sprite = inst.Sprite;
             _aspectRatioFitter.aspectRatio = inst.Aspect;
             DisplaySizeUpdate();
-        }));
+        }, ShowImage));
     }
 
     /// <summary>

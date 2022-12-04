@@ -46,7 +46,7 @@ public class TextureManager : SingletonMonoBehaviour<TextureManager> {
         _spriteDict.Clear();
     }
 
-    public IEnumerator LoadTextureCoroutine(string filePath, UnityAction<ISpriteInstance> unityAction) {
+    public IEnumerator LoadTextureCoroutine(string filePath, UnityAction<ISpriteInstance> unityAction, UnityAction reject) {
 
         if (_spriteDict.ContainsKey(filePath)) {
             unityAction?.Invoke(_spriteDict[filePath]);
@@ -55,6 +55,7 @@ public class TextureManager : SingletonMonoBehaviour<TextureManager> {
 
         if (!Util.FileExists(filePath)) {
             Common.Instance.LoadingActive(false);
+            reject?.Invoke();
             yield break;
         }
 
@@ -62,6 +63,7 @@ public class TextureManager : SingletonMonoBehaviour<TextureManager> {
         var texture2D = new Texture2D(1, 1);
         if (!texture2D.LoadImage(byteData)) {
             Common.Instance.LoadingActive(false);
+            reject?.Invoke();
             yield break;
         }
 
