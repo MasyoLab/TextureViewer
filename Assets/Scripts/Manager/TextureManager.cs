@@ -34,11 +34,12 @@ public class TextureManager : SingletonMonoBehaviour<TextureManager> {
         public void Release() {
             if (Sprite != null) {
                 Destroy(Sprite);
+                Sprite = null;
             }
             if (Texture != null) {
                 Destroy(Texture);
+                Texture = null;
             }
-            Sprite = null;
         }
     }
 
