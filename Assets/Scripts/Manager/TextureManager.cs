@@ -16,12 +16,15 @@ public class TextureManager : SingletonMonoBehaviour<TextureManager> {
     }
     public class SpriteInstance : ISpriteInstance {
         public Sprite Sprite { private set; get; }
+        public Texture2D Texture { private set; get; }
         public float Aspect { private set; get; }
         public int LifeSpan { set; get; }
 
-        public SpriteInstance(Sprite sprite, int width, int height) {
+        public SpriteInstance(Texture2D texture) {
+            var sprite = Sprite.Create(texture, new Rect(0f, 0f, texture.width, texture.height), new Vector2(0.5f, 0.5f));
             Sprite = sprite;
-            Aspect = (float)width / (float)height;
+            Texture = texture;
+            Aspect = (float)texture.width / (float)texture.height;
             LifeSpan = 10;
         }
         ~SpriteInstance() {
@@ -31,6 +34,9 @@ public class TextureManager : SingletonMonoBehaviour<TextureManager> {
         public void Release() {
             if (Sprite != null) {
                 Destroy(Sprite);
+            }
+            if (Texture != null) {
+                Destroy(Texture);
             }
             Sprite = null;
         }
@@ -68,8 +74,7 @@ public class TextureManager : SingletonMonoBehaviour<TextureManager> {
         }
 
         Debug.Log($"<color=#00FF00>Load... {filePath}</color>");
-        var sprite = Sprite.Create(texture2D, new Rect(0f, 0f, texture2D.width, texture2D.height), new Vector2(0.5f, 0.5f));
-        _spriteDict.Add(filePath, new(sprite, texture2D.width, texture2D.height));
+        _spriteDict.Add(filePath, new SpriteInstance(texture2D));
 
         unityAction?.Invoke(_spriteDict[filePath]);
         StartCoroutine(LifecycleCoroutine());
@@ -87,6 +92,10 @@ public class TextureManager : SingletonMonoBehaviour<TextureManager> {
         foreach (var item in _deletingTarget) {
             _spriteDict.Remove(item.Key);
         }
-        _deletingTarget.Clear();
+
+        if (_deletingTarget.Any()) {
+            _deletingTarget.Clear();
+            yield return Resources.UnloadUnusedAssets();
+        }
     }
 }
