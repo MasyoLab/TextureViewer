@@ -6,10 +6,23 @@ using System.IO;
 
 public static class Util {
 
+    /// <summary>
+    /// マウスボタン
+    /// </summary>
+    public enum MouseButtonEnum {
+        /// <summary>左ボタン</summary>
+        LEFT,
+        /// <summary>右ボタン</summary>
+        RIGHT,
+        /// <summary>中央ボタン</summary>
+        MIDDLE,
+    }
+
     public static bool FileExists(string path) {
         if (string.IsNullOrEmpty(path)) {
             return false;
         }
+
         if (!File.Exists(path)) {
             return false;
         }
@@ -18,6 +31,7 @@ public static class Util {
             return true;
         }
         catch (FileNotFoundException e) {
+            Debug.Log(e);
             return false;
         }
     }
@@ -26,6 +40,7 @@ public static class Util {
         if (string.IsNullOrEmpty(path)) {
             return false;
         }
+
         if (!Directory.Exists(path)) {
             return false;
         }

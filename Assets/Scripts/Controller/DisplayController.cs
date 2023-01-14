@@ -9,11 +9,13 @@ using UnityEngine.UI;
 public class DisplayController : MonoBehaviour {
 
     [SerializeField]
+    private RectTransform _display = null;
+    [SerializeField]
     private Image _image = null;
     [SerializeField]
     private AspectRatioFitter _aspectRatioFitter = null;
     [SerializeField]
-    private CustomButton _openButton = null;
+    private CustomButton _onOpen = null;
 
     private List<LinkedListNode<FileManager.FilePath>> _itemNodeList = new();
     private LinkedList<FileManager.FilePath> _itemLinked = new();
@@ -21,14 +23,12 @@ public class DisplayController : MonoBehaviour {
 
     private float _timeCount = 0;
     private Vector2 _screenSize = default;
-    private RectTransform _display => Common.Instance.Display;
 
     // Start is called before the first frame update
     private void Start() {
-        _openButton.onClick.AddListener(OnOpen);
+        _onOpen.onClick.AddListener(OnOpen);
 
-        _screenSize.x = _display.rect.width;
-        _screenSize.y = _display.rect.height;
+        SaveScreenSize();
         _image.color = Color.clear;
 
         Common.Instance.OnStart.AddListener(() => {
@@ -38,6 +38,7 @@ public class DisplayController : MonoBehaviour {
             SetAddLast();
             ShowImage();
         });
+
         Common.Instance.OnStop.AddListener(() => {
             enabled = false;
         });
@@ -52,6 +53,9 @@ public class DisplayController : MonoBehaviour {
             ShowImage();
             _timeCount = 0;
         }
+    }
+
+    private void FixedUpdate() {
         AdjustScreenSize();
     }
 
@@ -61,6 +65,7 @@ public class DisplayController : MonoBehaviour {
     private void SetAddLast() {
         _itemLinked.Clear();
         _itemNodeList.Clear();
+
         foreach (var item in Common.Instance.FileManager.FilePathList) {
             var linkedListNode = _itemLinked.AddLast(item);
             _itemNodeList.Add(linkedListNode);
@@ -76,6 +81,7 @@ public class DisplayController : MonoBehaviour {
             var rnd = random.Next(_itemNodeList.Count);
             _currentNode = _itemNodeList[rnd];
         }
+
         if (_currentNode.Next == null) {
             _currentNode = _itemLinked.First;
         }
@@ -107,16 +113,17 @@ public class DisplayController : MonoBehaviour {
         _image.SetNativeSize();
         _aspectRatioFitter.enabled = true;
 
-        if (_display.rect.height < _image.rectTransform.sizeDelta.y) {
-            _aspectRatioFitter.aspectMode = AspectRatioFitter.AspectMode.HeightControlsWidth;
-            var size = _image.rectTransform.sizeDelta;
-            size.y = _display.rect.height;
-            _image.rectTransform.sizeDelta = size;
-        }
         if (_display.rect.width < _image.rectTransform.sizeDelta.x) {
             _aspectRatioFitter.aspectMode = AspectRatioFitter.AspectMode.WidthControlsHeight;
             var size = _image.rectTransform.sizeDelta;
             size.x = _display.rect.width;
+            _image.rectTransform.sizeDelta = size;
+        }
+
+        if (_display.rect.height < _image.rectTransform.sizeDelta.y) {
+            _aspectRatioFitter.aspectMode = AspectRatioFitter.AspectMode.HeightControlsWidth;
+            var size = _image.rectTransform.sizeDelta;
+            size.y = _display.rect.height;
             _image.rectTransform.sizeDelta = size;
         }
     }
@@ -128,8 +135,7 @@ public class DisplayController : MonoBehaviour {
         if (_display.rect.width != _screenSize.x || _display.rect.height != _screenSize.y) {
             DisplaySizeUpdate();
         }
-        _screenSize.x = _display.rect.width;
-        _screenSize.y = _display.rect.height;
+        SaveScreenSize();
     }
 
     private void OnOpen() {
@@ -137,5 +143,10 @@ public class DisplayController : MonoBehaviour {
             return;
         }
         Util.OpenPath(_currentNode.Value.Path);
+    }
+
+    private void SaveScreenSize() {
+        _screenSize.x = _display.rect.width;
+        _screenSize.y = _display.rect.height;
     }
 }
