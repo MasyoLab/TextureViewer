@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8358407227826645691}
   - component: {fileID: 8854601851051274945}
   - component: {fileID: 5521706222526991952}
-  - component: {fileID: 8193779286981283374}
+  - component: {fileID: 4042103715119681437}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -78,7 +78,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8193779286981283374
+--- !u!114 &4042103715119681437
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -87,7 +87,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2536626713471394148}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93be0d8cdee936241bbd8002b0de3981, type: 3}
+  m_Script: {fileID: 11500000, guid: d91f7511b6172974c8f0142b03e9bdd2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
@@ -131,6 +131,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4255767913878867776}
+  - component: {fileID: 5495686632953299170}
   m_Layer: 5
   m_Name: ButtonPrefab
   m_TagString: Untagged
@@ -159,6 +160,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &5495686632953299170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4255767913878867783}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49ebd690a8334674b93c37227b530ca3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonAction: {fileID: 4042103715119681437}
 --- !u!1 &5138907903414578358
 GameObject:
   m_ObjectHideFlags: 0
@@ -252,8 +266,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 15
+  m_fontSizeBase: 15
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 0

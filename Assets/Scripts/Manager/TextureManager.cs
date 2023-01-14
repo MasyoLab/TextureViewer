@@ -36,6 +36,7 @@ public class TextureManager : SingletonMonoBehaviour<TextureManager> {
                 Destroy(Sprite);
                 Sprite = null;
             }
+
             if (Texture != null) {
                 Destroy(Texture);
                 Texture = null;
@@ -84,12 +85,14 @@ public class TextureManager : SingletonMonoBehaviour<TextureManager> {
     private IEnumerator LifecycleCoroutine() {
         yield return null;
         _deletingTarget.Clear();
+
         foreach (var item in _spriteDict) {
             item.Value.LifeSpan--;
             if (item.Value.LifeSpan <= 0) {
                 _deletingTarget.Add(item);
             }
         }
+
         foreach (var item in _deletingTarget) {
             _spriteDict.Remove(item.Key);
         }

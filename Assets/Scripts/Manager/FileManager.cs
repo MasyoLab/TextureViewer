@@ -9,6 +9,11 @@ using System.IO;
 /// </summary>
 public class FileManager : SingletonMonoBehaviour<FileManager> {
 
+    private readonly string[] EXTENSIONS = {
+        ".png",
+        ".jpg",
+    };
+
     public class FilePath {
         public string Path { private set; get; }
 
@@ -60,7 +65,7 @@ public class FileManager : SingletonMonoBehaviour<FileManager> {
 
         // 指定ディレクトリを検索
         {
-            var files = Util.GetFiles(path, SearchOption.TopDirectoryOnly, ".png", ".jpg");
+            var files = Util.GetFiles(path, SearchOption.TopDirectoryOnly, EXTENSIONS);
             var filePaths = FilePath.Create(files);
             _filePathDict.Add(path, filePaths);
             _filePathList.AddRange(filePaths);
@@ -73,7 +78,7 @@ public class FileManager : SingletonMonoBehaviour<FileManager> {
 
             yield return null;
             foreach (var folderStr in directories) {
-                var files = Util.GetFiles(folderStr, SearchOption.AllDirectories, ".png", ".jpg");
+                var files = Util.GetFiles(folderStr, SearchOption.AllDirectories, EXTENSIONS);
                 var filePaths = FilePath.Create(files);
                 _filePathDict.Add(folderStr, filePaths);
                 _filePathList.AddRange(filePaths);
